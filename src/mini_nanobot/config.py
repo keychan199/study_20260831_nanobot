@@ -1,3 +1,5 @@
+from __future__ import annotations# 开启类型提示
+
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
@@ -9,7 +11,7 @@ load_dotenv()
 
 
 class ProviderConfig(BaseModel):
-    model_config = ConfigDict(validate_default=True)
+    model_config = ConfigDict(validate_default=True)# 默认不校验环境变量，开启校验默认值是否符合要求
     api_key: str = Field(default_factory = lambda: os.getenv("OPENAI_API_KEY", ""))# 每次实例化时都从环境变量中获取
     api_base: str = Field(default_factory = lambda: os.getenv(
         "OPENAI_API_BASE", 
