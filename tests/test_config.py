@@ -23,7 +23,7 @@ def test_strips_trailing_slash() -> None:
 
 
 def test_env_default_is_validated(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv(
+    monkeypatch.setenv(# 临时设置环境变量OPENAI_API_BASE
         "OPENAI_API_BASE",
         "https://[workspace-id].example.com/v1"
     )

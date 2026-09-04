@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, ConfigDict
 
 
 
@@ -9,6 +9,7 @@ load_dotenv()
 
 
 class ProviderConfig(BaseModel):
+    model_config = ConfigDict(validate_default=True)
     api_key: str = Field(default_factory = lambda: os.getenv("OPENAI_API_KEY", ""))# 每次实例化时都从环境变量中获取
     api_base: str = Field(default_factory = lambda: os.getenv(
         "OPENAI_API_BASE", 
@@ -20,8 +21,13 @@ class ProviderConfig(BaseModel):
     timeout_seconds: int = Field(default_factory = lambda: int(os.getenv("MODEL_TIMEOUT_SECONDS", "120")), ge=0)#最小值校验
 
     @field_validator("api_base")# 校验api_base是否通过以下函数
+    @classmethod
     def validate_api_base(cls, v: str) -> str:
+   
+        if any(char in v for char in ["[", "]"]):
+            raise ValueError("api_base不能包含占位符")
+        
         if v.endswith("/"):
             return v[:-1]
-        return v
-   
+
+        return v 
