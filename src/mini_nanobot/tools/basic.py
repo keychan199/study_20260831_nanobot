@@ -17,7 +17,7 @@ _OPS = {
 }
 
 
-def _eval(node: ast.AST) -> float:
+def _eval(node: ast.AST):
     if isinstance(node, ast.BinOp) and type(node.op) in _OPS:
         return _OPS[type(node.op)](_eval(node.left), _eval(node.right))#先算左子树、再算右子树，最后用运算符合并
     if isinstance(node, ast.UnaryOp) and type(node.op) in _OPS:

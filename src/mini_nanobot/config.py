@@ -1,10 +1,9 @@
 from __future__ import annotations# 开启类型提示
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator, ConfigDict, ValidationError
 from dotenv import load_dotenv
 import os
-from pydantic import Field, field_validator, ConfigDict
-
+from pathlib import Path
 
 
 load_dotenv()
@@ -33,3 +32,33 @@ class ProviderConfig(BaseModel):
             return v[:-1]
 
         return v 
+
+
+class AppConfig(BaseModel):
+    provider: ProviderConfig = Field(default_factory=ProviderConfig)
+    workspace_dir: Path = Field(
+        default_factory=lambda: Path(os.getenv("WORKSPACE_DIR", "./workspace")).resolve()
+    )
+
+    @property
+    def db_path(self) -> Path:
+        return self.workspace_dir / "sessions.db"
+
+    @property
+    def memory_dir(self) -> Path:
+        return self.workspace_dir / "memory"
+
+    def ensure_dirs(self) -> None:
+        self.workspace_dir.mkdir(parents=True, exist_ok=True)
+        self.memory_dir.mkdir(parents=True, exist_ok=True)
+
+def load_config() -> AppConfig:
+    load_dotenv()
+    try:
+        cfg = AppConfig()
+    except ValidationError as exc:
+        raise ConfigurationError(f"配置无效：\n{exc}") from exc
+    if not cfg.provider.api_key:
+        raise ConfigurationError("未设置 OPENAI_API_KEY")
+    cfg.ensure_dirs()
+    return cfg
