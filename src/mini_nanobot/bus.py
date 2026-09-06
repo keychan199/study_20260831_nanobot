@@ -42,7 +42,9 @@ class MessageBus:
     """两个 asyncio 队列，仅此而已。"""
 
     def __init__(self) -> None:
+        # 从 Channel 流向 AgentService 的消息队列
         self.inbound: asyncio.Queue[InboundMessage] = asyncio.Queue()
+        # 从 AgentService 流向 Channel 的消息队列
         self.outbound: asyncio.Queue[OutboundMessage] = asyncio.Queue()
 
     async def publish_inbound(self, msg: InboundMessage) -> None:
