@@ -15,7 +15,7 @@ class BlockingChannel(BaseChannel):
     async def start(self) -> None:
         self._running = True
         self.started.set()
-        await self.release.wait()
+        await self.release.wait() # 等待 stop 方法调用
         self._running = False
 
     async def stop(self) -> None:
@@ -26,10 +26,10 @@ class BlockingChannel(BaseChannel):
         return None
 
 @pytest.mark.asyncio #用循环事件跑
-async def test_manager_dose_not_exist_before_channel_start() -> None:
-    manager = ChannelManager(bus, [channel])
+async def test_manager_does_not_exist_before_channel_start() -> None:
     bus = MessageBus()
     channel = BlockingChannel(bus)
+    manager = ChannelManager(bus, [channel])
     await manager.start()
     waiter = asyncio.create_task(manager.wait_until_all_stopped())
     await channel.started.wait()
