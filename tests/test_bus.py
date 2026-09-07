@@ -17,3 +17,12 @@ def test_roundtrip() -> None:
         assert out.content == "收到"
 
     asyncio.run(scenario())
+
+def test_outbound_message_defaults():
+    """验证 event 不传时默认是 "final"。"""
+    async def scenario():
+        bus = MessageBus()
+        outbound = OutboundMessage("console", "s1", "收到")
+        assert outbound.event == "final"
+            
+
