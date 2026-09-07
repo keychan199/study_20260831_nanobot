@@ -36,7 +36,7 @@ class ChannelManager:
         for task in self._tasks:
             task.cancel()
         if self._tasks:
-            await asyncio.gather(*self._tasks, return_exceptions=True)
+            await asyncio.gather(*self._tasks, return_exceptions=True) #把控制权交回事件循环
 
     async def _dispatch_outbound(self) -> None:
         while True:

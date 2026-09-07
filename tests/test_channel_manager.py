@@ -27,6 +27,7 @@ class BlockingChannel(BaseChannel):
 
 @pytest.mark.asyncio #用循环事件跑
 async def test_manager_does_not_exist_before_channel_start() -> None:
+    #并发时序测试
     bus = MessageBus()
     channel = BlockingChannel(bus)
     manager = ChannelManager(bus, [channel])
