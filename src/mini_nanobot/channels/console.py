@@ -53,7 +53,7 @@ class ConsoleChannel(BaseChannel):
                 self._running = False
                 break
             if line == "/help":
-                _console.print(HELP)
+                _console.print(HELP_TEXT)
                 continue
             if line == "/new":
                 self.session_id = uuid.uuid4().hex
