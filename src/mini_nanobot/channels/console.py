@@ -29,11 +29,27 @@ class ConsoleChannel(BaseChannel):
     name = "console"
     supports_streaming = False  # 本章先关流式，降低复杂度
 
-    def __init__(self, bus: MessageBus) -> None:
+    def __init__(self, bus: MessageBus, sessions: SessionManager) -> None:
         super().__init__(bus)
+        self.sessions = sessions
         self.session_id = uuid.uuid4().hex # 122 位随机数，去掉 '-'
 
+    def _restore_active_session(self) -> None:
+        """恢复持久化的活动会话；首次启动时创建一个。"""
+        active = self.sessions.get_active()
+        if active is None:
+            active = self.sessions.create("控制台会话")
+        self.sessions.activate(active.thread_id)
+        self.session_id = active.thread_id
+
+    def _create_session(self) -> None:
+        """创建并激活一个可持久化的新会话。"""
+        session = self.sessions.create("控制台会话")
+        self.sessions.activate(session.thread_id)
+        self.session_id = session.thread_id
+
     async def start(self) -> None:
+        self._restore_active_session()
         self._running = True
         _console.print("[bold cyan]mini-nanobot[/bold cyan] 输入 /help 查看命令\n")
         loop = asyncio.get_running_loop()
@@ -56,7 +72,7 @@ class ConsoleChannel(BaseChannel):
                 _console.print(HELP_TEXT)
                 continue
             if line == "/new":
-                self.session_id = uuid.uuid4().hex
+                self._create_session()
                 _console.print("[yellow]已开启新会话[/yellow]\n")
                 continue
             await self._handle_message(self.session_id, line)

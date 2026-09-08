@@ -7,14 +7,15 @@ from .bus import MessageBus
 from .channels import ChannelManager, ConsoleChannel
 from .config import ConfigurationError, load_config
 from .service import AgentService
+from .session import SessionManager
 
 logging.basicConfig(level=logging.WARNING)
 
 
 async def _main() -> None:
-    load_config()  # 提前校验 .env
+    cfg = load_config()  # 提前校验 .env
     bus = MessageBus()
-    console = ConsoleChannel(bus)
+    console = ConsoleChannel(bus, SessionManager(cfg.workspace_dir))
     manager = ChannelManager(bus, [console])
     service = AgentService(bus)
     service_task = asyncio.create_task(service.run())
