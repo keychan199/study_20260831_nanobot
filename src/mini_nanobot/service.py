@@ -30,9 +30,14 @@ class AgentService:
                 await self._reply(msg, f"处理失败：{exc}")
 
     async def _process(self, msg: InboundMessage) -> None:
-        result = await self.agent.ainvoke(
+        # result = await self.agent.ainvoke(
+        #     {"messages": [HumanMessage(content=msg.content)]},
+        #     config={"configurable": {"thread_id": msg.session_id}},
+        # )
+        result = await graph.ainvoke(
             {"messages": [HumanMessage(content=msg.content)]},
             config={"configurable": {"thread_id": msg.session_id}},
+            context=AgentContext(session_id=msg.session_id, memory=memory, pending=None),
         )
         content = str(result["messages"][-1].content)
         await self._reply(msg, content)

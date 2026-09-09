@@ -12,6 +12,10 @@ from contextlib import asynccontextmanager
 # 受限于 SQLite 的写入性能，**不推荐用于生产环境**
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 
+from .state import AgentState, AgentContext
+from .middleware import build_agent_middleware
+
+
 def build_llm(cfg: AppConfig) -> ChatOpenAI:
     return ChatOpenAI(
         api_key=cfg.provider.api_key,
@@ -28,8 +32,10 @@ def build_agent(cfg: AppConfig | None = None) -> CompiledStateGraph:
     return create_agent(
         model=llm,
         tools=BASIC_TOOLS,
-        system_prompt=build_system_prompt(),
+        # system_prompt=build_system_prompt(),
         name="react_agent",
+        state_schema=AgentState,
+        context_schema=AgentContext,
     )
 
 
@@ -45,7 +51,15 @@ async def create_app(cfg: AppConfig):
         graph = create_agent(
             model=llm,
             tools=BASIC_TOOLS,
-            system_prompt=build_system_prompt(),
+            # system_prompt=build_system_prompt(),
+            middleware=build_agent_middleware(
+                llm,
+                context_window=cfg.context_window,
+                consolidation_ratio=cfg.consolidation_ratio,
+                max_model_calls=cfg.max_iterations,
+            ),
+            state_schema=AgentState,
+            context_schema=AgentContext,
             checkpointer=saver,
             name="react_agent",
         )
