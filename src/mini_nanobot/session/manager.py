@@ -135,7 +135,9 @@ class SessionManager:
         if store is None:
             if data_dir is None:
                 raise ValueError("data_dir 和 store 至少需要提供一个")
-            store = JsonSessionMetadataStore(Path(data_dir) / "sessions.json")
+            store = JsonSessionMetadataStore(
+                Path(data_dir) / "sessions" / "sessions.json"
+                )
         elif data_dir is not None:
             raise ValueError("data_dir 和 store 不能同时提供")
 

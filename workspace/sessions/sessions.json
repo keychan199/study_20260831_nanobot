@@ -1,0 +1,18 @@
+{
+  "active_thread_id": "67f89f7cfd0346efa7fbce30bfa7466c",
+  "sessions": {
+    "67f89f7cfd0346efa7fbce30bfa7466c": {
+      "created_at": "2026-09-09T06:53:53.501025+00:00",
+      "thread_id": "67f89f7cfd0346efa7fbce30bfa7466c",
+      "title": "控制台会话",
+      "updated_at": "2026-09-09T06:53:53.501025+00:00"
+    },
+    "c1d4bcdb1b60486789218a74122d045f": {
+      "created_at": "2026-09-09T01:47:52.560684+00:00",
+      "thread_id": "c1d4bcdb1b60486789218a74122d045f",
+      "title": "控制台会话",
+      "updated_at": "2026-09-09T01:47:52.560684+00:00"
+    }
+  },
+  "version": 1
+}
